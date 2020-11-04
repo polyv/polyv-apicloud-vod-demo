@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>配置</title>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <script type="text/javascript" src="../script/api.js"></script>
+</head>
+<body>
+    <div id="secretKey" class="main">
+        <label>选择加密串：</label>
+        </br></br>
+        <input type="checkbox" id="check1" name="school" checked="true" value="yQRmgnzPyCUYDx6weXRATIN8gkp7BYGAl3ATjE/jHZunrULx8CoKa1WGMjfHftVChhIQlCA9bFeDDX+ThiuBHLjsNRjotqxhiz97ZjYaCQH/MhUrbEURv58317PwPuGEf3rbLVPOa4c9jliBcO+22A==">网校</input>
+        <br/>
+        <input type="checkbox" id="check2" name="test"
+            value=""
+            >测试账号</input>
+        <br/>
+        <input type="text" id="customConfigStr"
+            style="width:95%; margin-top:20px; margin-right:5%; margin-bottom:20px;">
+        </input>
+        <br/>
+        <button onclick="config()">设置</button>
+    </div>
+    </br>
+    <hr/>
+    <div class="main">
+        <label>通过 userid、readtoken、writetoke、secretkey 配置用户信息：</label>
+        </br></br>
+        <label>userid:</label>
+        <input type="text" id="useridStr"
+        style="width:70%; margin-top:10px; margin-right:5%;" value=""/>
+        </br>
+        <label>readtoken:</label>
+        <input type="text" id="readtokenStr"
+               style="width:70%; margin-top:10px; margin-right:5%;" value=""/>
+        </br>
+        <label>writetoke:</label>
+        <input type="text" id="writetokeStr"
+               style="width:70%; margin-top:10px; margin-right:5%;" value=""/>
+        </br>
+        <label>secretkey:</label>
+        <input type="text" id="secretkeyStr"
+               style="width:70%; margin-top:10px; margin-right:5%;" value=""/>
+        </br></br>
+        <button onclick="setToken()">设置 token</button>
+    </div>
+</body>
+<script>
+    apiready = function() {
+        polyvConfig = api.require('polyvConfigModule');
+    };
+
+    // 配置加密串
+    function config() {
+        var school = $api.byId("check1").checked;
+        var test = $api.byId("check2").checked;
+        var custom = $api.byId("customConfigStr").value;
+        var configStr = null;
+        if (test == true) {
+            configStr = $api.byId("check2").value;
+        } else if (school == true) {
+            configStr = $api.byId("check1").value;
+        } else if (custom != null && custom != "") {
+            configStr = custom;
+        }
+
+        var param;
+        if (configStr == null) {
+            param = {};
+        } else {
+            param = {config: configStr};
+        }
+
+        polyvConfig.setConfig(param, function(ret, err) {
+            if (!ret.isSuccess) {
+                alert("加密串设置失败");
+                if (err != null && err.msg != null) {
+                    console.log(err.msg);
+                }
+            } else {
+                alert("加密串设置成功");
+            }
+        });
+    }
+
+    // 配置 token
+    function setToken() {
+        var useridStr = $api.byId("useridStr").value;
+        var readtokenStr = $api.byId("readtokenStr").value;
+        var writetokeStr = $api.byId("writetokeStr").value;
+        var secretkeyStr = $api.byId("secretkeyStr").value;
+
+        var param = {userid: useridStr,
+                readtoken:readtokenStr,
+                writetoken:writetokeStr,
+                secretkey:secretkeyStr
+        };
+
+        polyvConfig.setToken(param, function(ret, err) {
+            if (!ret.isSuccess) {
+                alert("token设置失败");
+                if (err != null && err.msg != null) {
+                    console.log(err.msg);
+                }
+            } else {
+                alert("token设置成功");
+            }
+        });
+    }
+</script>
+</html>

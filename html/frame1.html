@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html class="video-frame-wrap">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>视频播放</title>
+    <link rel="stylesheet" type="text/css" href="../css/video/videoFrame.css">
+    <script type="text/javascript" src="../../script/api.js"></script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="config-wrap">
+    <div>
+        <label>path:</label>
+        <input class="local-path large" placeholder="播放文件本地路径 fs://res/intro.mp4"/>
+    </div>
+    <div>
+        <label>vid:</label>
+        <input class="video-vid large" value="e97dbe3e64c318bd1d82e21585304cbf_e"/>
+    </div>
+    <div class="switch switch-small">
+        <label>autoPlay:</label>
+        <input class="auto-check check" type="checkbox" checked />
+    </div>
+    <div class="switch switch-small">
+        <label>fixed:</label>
+        <input class="fixed-check check" type="checkbox" checked />
+    </div>
+    <div class="switch switch-small">
+        <label>seekType:</label>
+        <input class="seek-type-check check" type="checkbox" checked />
+    </div>
+    <div class="switch switch-large">
+        <label>disableScreenCAP:</label>
+        <input class="cap-check check" type="checkbox"/>
+    </div>
+    <div class="hd-selected">默认初始清晰度: <span class="hd-info">自动</span></div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">清晰度
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><div role="menuitem" tabindex="0">自动</div></li>
+            <li><div role="menuitem" tabindex="1">流畅</div></li>
+            <li><div role="menuitem" tabindex="2">高清</div></li>
+            <li><div role="menuitem" tabindex="3">超清</div></li>
+        </ul>
+    </div>
+    <div class="play-btn">开始播放</div>
+</div>
+<div class="change-vid-wrap hide">
+    <input class="change-vid" value="e97dbe3e64166baab93b59dec37637bd_e"/>
+    <div class="btn change-btn">切换视频VID</div>
+</div>
+<script src="../script/video/videoFrame.js?ran=1111"></script>
+</body>
+</html>

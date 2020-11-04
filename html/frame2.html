@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>信息</title>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <script type="text/javascript" src="../script/api.js"></script>
+</head>
+<body>
+<div class="main">
+    <label>选择视频</label>
+    <input type="input" id="input1" value="1" style="width:10%;"></input>
+    &nbsp;&nbsp;
+    <label>选择码率</label>
+    <input type="input" id="levelInput1" value="1" style="width:10%;"></input>
+    &nbsp;&nbsp;
+    <label id="result1"></label>
+    <br>
+    <button id="school" onclick="getSchoolVideoDuration()">获取时长</button>
+    &nbsp;&nbsp;
+    <button id="school" onclick="getSchoolVideoSize()">获取大小</button>
+    &nbsp;&nbsp;
+    <button id="school" onclick="getSchoolVideoLevelNum()">获取码率</button>
+    <br><br>
+    <label>网校视频</label>
+    <br>
+    <label id=schoolVids[0]>1. 测试视频</label>
+    <br>
+    <label id=schoolVids[1]>2. 测试视频</label>
+    <br>
+    <label id=schoolVids[2]>3. 测试视频</label>
+    <br>
+    <label id=schoolVids[3]>4. 测试视频</label>
+</div>
+</body>
+<script>
+  apiready = function() {
+    videoInfo = api.require('polyvVideoInfoModule');
+    schoolVids = [
+      "e97dbe3e64c247499b55f213a4470052_e",
+      "e97dbe3e6443458a5643ba1f8b1c0626_e",
+      "e97dbe3e646dbfcc97ac1a188303cd39_e",
+      "e97dbe3e6445d27d4fbfdd96b8bc3554_e",
+    ];
+  }
+  function getSchoolVideoDuration() {
+    var index = $api.byId("input1").value;
+    index = index - 1;
+    var vid = schoolVids[index];
+    videoInfo.getDuration({
+      vid: vid
+    }, function(ret, err) {
+      if (err != null && err.msg) {
+        alert(err.msg);
+      } else if (ret != null && ret.duration != null) {
+        var content = "时长 " + ret.duration + "秒";
+        console.log("vid " + ret.vid + " " + content);
+        $api.byId("result1").innerHTML = content;
+      }
+    });
+  }
+  function getSchoolVideoSize() {
+    var index = $api.byId("input1").value;
+    var level = $api.byId("levelInput1").value;
+    index = index - 1;
+    var vid = schoolVids[index];
+    videoInfo.getFileSize({
+      vid: vid,
+      level: level
+    }, function(ret, err) {
+      if (err != null && err.msg) {
+        alert(err.msg);
+      } else if (ret != null && ret.fileSize != null) {
+        var content = "大小 " + ret.fileSize + "字节";
+        console.log("vid " + content);
+        $api.byId("result1").innerHTML = content;
+      }
+    });
+  }
+  function getSchoolVideoLevelNum() {
+    var index = $api.byId("input1").value;
+    index = index - 1;
+    var vid = schoolVids[index];
+    videoInfo.getLevelNum({
+      vid: vid
+    }, function(ret, err) {
+      if (err != null && err.msg) {
+        alert(err.msg);
+      } else if (ret != null && ret.levelNum != null) {
+        var content = "支持码率 " + ret.levelNum;
+        console.log("vid " + content);
+        $api.byId("result1").innerHTML = content;
+      }
+    });
+  }
+  function getMyVideoDuration() {
+    var index = $api.byId("input2").value;
+    index = index - 1;
+    var vid = myVids[index];
+    videoInfo.getDuration({
+      vid: vid
+    }, function(ret, err) {
+      if (err != null && err.msg) {
+        alert(err.msg);
+      } else if (ret != null && ret.duration != null) {
+        var content = "时长 " + ret.duration + "秒";
+        console.log("vid " + ret.vid + " " + content);
+        $api.byId("result2").innerHTML = content;
+      }
+    });
+  }
+  function getMyVideoSize() {
+    var index = $api.byId("input2").value;
+    index = index - 1;
+    var vid = myVids[index];
+    videoInfo.getFileSize({
+      vid: vid,
+      level: 1
+    }, function(ret, err) {
+      if (err != null && err.msg) {
+        alert(err.msg);
+      } else if (ret != null && ret.fileSize != null) {
+        var content = "大小 " + ret.fileSize + "字节";
+        console.log("vid " + content);
+        $api.byId("result2").innerHTML = content;
+      }
+    });
+  }
+  function getMyVideoLevelNum() {
+    var index = $api.byId("input2").value;
+    index = index - 1;
+    var vid = myVids[index];
+    videoInfo.getLevelNum({
+      vid: vid
+    }, function(ret, err) {
+      if (err != null && err.msg) {
+        alert(err.msg);
+      } else if (ret != null && ret.levelNum != null) {
+        var content = "支持码率 " + ret.levelNum;
+        console.log("vid " + content);
+        $api.byId("result2").innerHTML = content;
+      }
+    });
+  }
+</script>
+</html>

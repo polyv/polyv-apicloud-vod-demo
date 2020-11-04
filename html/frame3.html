@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>下载</title>
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <script type="text/javascript" src="../script/api.js"></script>
+</head>
+<body>
+    <button onclick="getDownloadList()">获取下载视频</button>
+    <br/>
+    <hr style="height:1px;border:none;border-top:1px solid #555555;" />
+    <label style="margin-top:20px">添加视频下载任务</label>
+    <br/>
+    <label style="width:20%">视频 vid</label>&nbsp;&nbsp;<input type="text" id="addVid" style="width:75%" value="e97dbe3e64c318bd1d82e21585304cbf_e"/><br/>
+    <label style="width:20%">视频 level</label>&nbsp;&nbsp;<input type="text" id="addLevel" style="width:10%" value="1"/><br/>
+    <button onclick="addDownloader()">增加</button>&nbsp;&nbsp;<button onclick="downloadedVideoExist()">是否存在</button>
+    <br/>
+    <hr style="height:1px;border:none;border-top:1px solid #555555;" />
+    <label style="margin-bottom:20px">下载视频列表</label>
+    <br/>
+    <button onclick="startALLDownloader()">全部开始</button>&nbsp;&nbsp;
+    <button onclick="stopAllDownloader()">全部暂停</button>&nbsp;&nbsp;
+    <button onclick="deleteAllVideo()">全部删除</button>
+    <hr style="height:1px;border:none;border-top:1px solid #555555;" />
+    <div>
+        <div id="downloadListDiv"></div>
+    </div>
+    <label>下载进度回调间隔时间设置</label>&nbsp;&nbsp;<input type="text" style="width:10%" value="1" id="intervalTime"/>
+    <button onclick="setDownloadingCallbackIntervalTime()">设置</button>
+</body>
+<script>
+    apiready = function() {
+        polyvDownloadModule = api.require('polyvVideoDownloadModule');
+        getDownloadList();
+    }
+
+    function getDownloadList() {
+        polyvDownloadModule.getDownloadList(function(ret, err){
+            var downloadList = ret.downloadList;
+            var videoList = [];
+            for (var i in downloadList){
+                var dict = downloadList[i];
+                var listVid = dict.vid;
+                videoList[listVid] = {vid:listVid, level:dict.level};
+            }
+
+            var html = "";
+            for (var listVid in videoList) {
+                html += getDownloadListItemHtml(listVid);
+            }
+
+            $api.html($api.byId("downloadListDiv"), html);
+
+            for (var listVid in videoList) {
+                $api.html($api.byId("vid_" + listVid), listVid);
+                $api.html($api.byId("bitrate_" + listVid), videoList[listVid].level);
+            }
+        });
+    }
+
+    function addDownloader() {
+        var vid = $api.byId("addVid").value;
+        var level = $api.byId("addLevel").value;
+        polyvDownloadModule.getDownloadList(function(ret, err){
+            var downloadList = ret.downloadList;
+            var videoList = [];
+            for (var i in downloadList){
+                var dict = downloadList[i];
+                var listVid = dict.vid;
+                videoList[listVid] = {vid:listVid, level:dict.level};
+            }
+
+            if (videoList[vid] == null) {
+                videoList[vid] = {vid:vid, level:level};
+            }
+
+            var html = "";
+            var downloadArr = [];
+            var index = 0;
+            for (var listVid in videoList) {
+                html += getDownloadListItemHtml(listVid);
+                downloadArr[index] = videoList[listVid];
+                index++;
+            }
+
+            $api.html($api.byId("downloadListDiv"), html);
+
+            for (var listVid in videoList) {
+                $api.html($api.byId("vid_" + listVid), listVid);
+                $api.html($api.byId("bitrate_" + listVid), videoList[listVid].level);
+            }
+
+            var param = {downloadArr:downloadArr};
+            polyvDownloadModule.addDownloader(param, function(ret, err) {
+                if (err != null && err.msg != null){
+                    alert("添加下载失败："+err.msg);
+                } else {
+                    for (var currVid in ret) {
+                        console.log("download ret: vid " + currVid + " level " + videoList[currVid].level);
+                        var statusDict = ret[currVid];
+                        $api.html($api.byId("vid_" + currVid), currVid);
+                        $api.html($api.byId("bitrate_" + currVid), videoList[currVid].level);
+                        if(statusDict != null && statusDict.downloadStatus != null){
+                            $api.html($api.byId("status_" + currVid), statusDict.downloadStatus);
+                        }
+                        if(statusDict != null && statusDict.downloadPercentage != undefined){
+                            console.log("download ret: percent " + statusDict.downloadPercentage);
+                            $api.html($api.byId("percentage_" + currVid), statusDict.downloadPercentage);
+                        }
+                    }
+
+                    for (var currVid in err){
+                        console.log("download err: " + currVid);
+                        $api.html($api.byId("vid_" + currVid), currVid);
+                        $api.html($api.byId("bitrate_" + currVid), videoList[currVid].level);
+                        $api.html($api.byId("err_" + currVid), err[currVid]);
+                    }
+                }
+            });
+        });
+    }
+
+    function getDownloadListItemHtml(vid) {
+        var downloadListItem = '<label>vid:</label><label id="vid_' + vid + '"></label>'
+        + '<br/>'
+        + '<label>码率:</label><label id="bitrate_' + vid + '"></label>'
+        + '<br/>'
+        + '<label>状态:</label><label id="status_' + vid + '"></label>'
+        + '<br/>'
+        + '<label>下载进度:</label><label id="percentage_' + vid + '"></label>'
+        + '<br/>'
+        + '<label>错误信息:</label><label id="err_' + vid + '"></label>'
+        + '<br/>'
+        + '<input type="button" onclick="startDownloader(\'' + vid + '\')" id="start_' + vid + '" value="开始"/>&nbsp;&nbsp;'
+        + '<input type="button" onclick="stopDownloader(\'' + vid + '\')" id="stop_' + vid + '" value="暂停"/>&nbsp;&nbsp;'
+        + '<input type="button" onclick="deleteVideo(\'' + vid + '\')" id="delete_' + vid + '" value="删除"/>&nbsp;&nbsp;'
+        + '<hr style="height:1px;border:none;border-top:1px solid #555555;" />';
+        return downloadListItem;
+    }
+
+    function setDownloadingCallbackIntervalTime() {
+        var intervalTime = $api.val($api.byId("intervalTime"));
+        polyvDownloadModule.setDownloadingCallbackIntervalTime({seconds:intervalTime});
+    }
+
+    function refreshDownloadList() {
+        polyvDownloadModule.getDownloadList(function(ret, err){
+            var downloadList = ret.downloadList;
+            var html = "";
+            for (var i in downloadList){
+                var dict = downloadList[i];
+                html += getDownloadListItemHtml(dict.vid);
+            }
+
+            if (html == undefined) {
+                html = "";
+            }
+
+            $api.html($api.byId("downloadListDiv"), html);
+        });
+    }
+
+    function startDownloader(vid) {
+        polyvDownloadModule.startDownloader({
+            vid:vid
+        }, function(ret, err) {
+            if (err != null) {
+                alert(err.msg);
+            }
+        });
+    }
+
+    function startALLDownloader() {
+        polyvDownloadModule.startALLDownloader();
+    }
+
+    function stopDownloader(vid) {
+        polyvDownloadModule.stopDownloader({
+            vid:vid
+        }, function(ret, err) {
+            if (err != null) {
+                alert(err.msg);
+            }
+        });
+    }
+
+    function stopAllDownloader() {
+        polyvDownloadModule.stopAllDownloader();
+    }
+
+    function downloadedVideoExist() {
+        var vid = $api.byId("addVid").value;
+        var level = $api.byId("addLevel").value;
+        polyvDownloadModule.downloadedVideoExist({
+            vid:vid,
+            level:level
+        }, function(ret, err){
+            if (ret != null && ret.exist != null) {
+                var str = (ret.exist == true) ? "存在" : "不存在";
+                api.toast({
+                    msg: str
+                });
+            } else {
+                alert(err.msg);
+            }
+        });
+    }
+
+    function deleteVideo(vid) {
+        polyvDownloadModule.deleteVideo({
+            vid:vid
+        }, function(ret, err) {
+            if (err != null) {
+                alert(err.msg);
+            }
+        });
+
+        refreshDownloadList();
+    }
+
+    function deleteAllVideo() {
+        polyvDownloadModule.deleteAllVideo();
+        refreshDownloadList();
+    }
+</script>
+</html>
